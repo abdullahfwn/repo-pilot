@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>RepoPilot - AI Repository Analyzer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['Consolas', 'Monaco', 'Andale Mono', 'monospace'],
+              serif: ['Instrument Serif', 'serif'],
+              mono: ['Consolas', 'Monaco', 'Andale Mono', 'monospace'],
+            },
+            colors: {
+              palladian: '#EEE9DF',
+              oatmeal: '#C9C1B1',
+              blueFantastic: '#2c3B4D',
+              burningFlame: '#FFB162',
+              truffle: '#A35139',
+              abyssal: '#1B2632',
+              background: '#EEE9DF',
+              primary: '#1B2632',
+              secondary: '#A35139',
+              accent: '#FFB162',
+            },
+            keyframes: {
+              fadeInDown: {
+                '0%': { opacity: '0', transform: 'translateY(-10px)' },
+                '100%': { opacity: '1', transform: 'translateY(0)' },
+              }
+            },
+            animation: {
+              'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+              'spin-slow': 'spin 3s linear infinite',
+              'fade-in-down': 'fadeInDown 0.3s ease-out forwards',
+            }
+          }
+        }
+      }
+    </script>
+    <style>
+      body {
+        background-color: #EEE9DF;
+        color: #1B2632;
+        font-family: 'Consolas', 'Monaco', 'Andale Mono', monospace;
+      }
+      
+      /* Custom Scrollbar to match theme */
+      ::-webkit-scrollbar {
+        width: 10px;
+        height: 10px;
+      }
+      ::-webkit-scrollbar-track {
+        background: #EEE9DF; 
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #C9C1B1; 
+        border: 2px solid #EEE9DF;
+        border-radius: 5px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: #A35139; 
+      }
+    </style>
+  <script type="importmap">
+{
+  "imports": {
+    "motion/": "https://esm.sh/motion@^12.34.1/",
+    "react/": "https://esm.sh/react@^19.2.4/",
+    "react": "https://esm.sh/react@^19.2.4",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.4/",
+    "@vitejs/plugin-react": "https://esm.sh/@vitejs/plugin-react@^5.1.4",
+    "vite": "https://esm.sh/vite@^7.3.1",
+    "recharts": "https://esm.sh/recharts@^3.7.0",
+    "@google/genai": "https://esm.sh/@google/genai@^1.41.0",
+    "lucide-react": "https://esm.sh/lucide-react@^0.574.0"
+  }
+}
+</script>
+</head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/index.tsx"></script>
+  </body>
+</html>

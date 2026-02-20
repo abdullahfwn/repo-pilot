@@ -1,0 +1,5 @@
+{
+  "name": "RepoPilot updated",
+  "description": "RepoPilot - A sophisticated React interface for GitHub Repository Analysis. Features a simulation of the machine learning pipeline, scoring system, and improvement suggestions, powered by Gemini for dynamic report generation.",
+  "requestFramePermissions": []
+}
