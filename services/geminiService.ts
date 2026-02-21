@@ -43,13 +43,20 @@ export async function analyzeRepository(repoName: string, references: string): P
       });
 
       if (!mlResponse.ok) {
-        const errText = await mlResponse.text();
-        throw new Error(errText);
+        let errMessage = `HTTP Error ${mlResponse.status} from ML Backend`;
+        try {
+          const errJson = await mlResponse.json();
+          if (errJson && errJson.detail) errMessage = errJson.detail;
+        } catch {
+          const errText = await mlResponse.text();
+          if (errText) errMessage = errText;
+        }
+        throw new Error(errMessage);
       }
 
       mlData = await mlResponse.json();
     } catch (e: any) {
-      throw new Error(`Failed to communicate with ML Backend: ${e.message}`);
+      throw new Error(`Failed to communicate with ML Backend: ${e.message || String(e)}`);
     }
 
     const fileTreePaths = mlData.file_tree;
