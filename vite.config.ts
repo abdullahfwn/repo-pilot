@@ -8,6 +8,14 @@ export default defineConfig(({ mode }) => {
 
   return {
     plugins: [react()],
+    server: {
+      proxy: {
+        '/api': {
+          target: 'http://127.0.0.1:8000',
+          changeOrigin: true,
+        },
+      },
+    },
     define: {
       // This ensures process.env.API_KEY is replaced with the actual string during build
       // We check both the loaded env vars (from .env) AND the system process.env (for Vercel/CI)
