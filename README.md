@@ -1,7 +1,3 @@
-<div align="center">
-  <img width="800" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
-
 <h1 align="center">RepoPilot</h1>
 <p align="center">
   <b>Instant AI-Powered GitHub Repository Analyzer</b><br/>
