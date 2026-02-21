@@ -1,3 +1,9 @@
+import pandas as pd
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.pipeline import make_pipeline
+from sklearn.preprocessing import StandardScaler
+import numpy as np
+
 # A basic feature extractor for the file tree
 def extract_features(file_tree: list[str]) -> dict:
     features = {
@@ -17,38 +23,92 @@ def extract_features(file_tree: list[str]) -> dict:
     return features
 
 
+# Generate some synthetic training data for our model
+def generate_synthetic_data(num_samples=200):
+    data = []
+    for _ in range(num_samples):
+        # Random feature simulation
+        total_files = np.random.randint(10, 500)
+        test_ratio = np.random.uniform(0, 0.4)
+        doc_ratio = np.random.uniform(0, 0.2)
+        has_ci = np.random.choice([0, 1], p=[0.4, 0.6])
+        has_docker = np.random.choice([0, 1], p=[0.5, 0.5])
+        js_ts_files = int(total_files * np.random.uniform(0.1, 0.8))
+        config_files = np.random.randint(2, 10)
+        max_depth = np.random.randint(2, 8)
+        
+        # Calculate scores realistically
+        code_quality = 40 + (test_ratio * 100) + (has_ci * 10) - (max_depth * 2)
+        security = 50 + (has_docker * 10) + (has_ci * 15)
+        documentation = 30 + (doc_ratio * 300)
+        maintainability = 60 + (test_ratio * 50) + (doc_ratio * 100) - (max_depth * 3)
+        dependencies = 50 + (config_files * 3)
+        test_coverage = test_ratio * 250
+        
+        # Cap at 100
+        scores = {k: min(100, max(10, v)) for k, v in {
+            'codeQuality': code_quality,
+            'security': security,
+            'documentation': documentation,
+            'maintainability': maintainability,
+            'dependencies': dependencies,
+            'testCoverage': test_coverage
+        }.items()}
+        
+        # Calculate overall as average
+        scores['overall'] = sum(scores.values()) / len(scores)
+
+        features = {
+            'total_files': total_files,
+            'js_ts_files': js_ts_files,
+            'py_files': 0,
+            'md_files': int(total_files * doc_ratio),
+            'test_files': int(total_files * test_ratio),
+            'config_files': config_files,
+            'has_docker': has_docker,
+            'has_ci': has_ci,
+            'max_depth': max_depth,
+            'test_ratio': test_ratio,
+            'doc_ratio': doc_ratio,
+        }
+        
+        data.append({**features, **scores})
+        
+    return pd.DataFrame(data)
+
+# Global models dictionary
+models = {}
+feature_cols = [
+    'total_files', 'js_ts_files', 'py_files', 'md_files', 'test_files',
+    'config_files', 'has_docker', 'has_ci', 'max_depth', 'test_ratio', 'doc_ratio'
+]
+target_cols = ['overall', 'codeQuality', 'security', 'documentation', 'maintainability', 'dependencies', 'testCoverage']
+
+def train_models():
+    """Trains the regression models on the synthetic dataset."""
+    print("Training ML models...")
+    df = generate_synthetic_data(500)
+    X = df[feature_cols]
+    
+    for target in target_cols:
+        y = df[target]
+        model = make_pipeline(StandardScaler(), RandomForestRegressor(n_estimators=50, random_state=42))
+        model.fit(X, y)
+        models[target] = model
+        
+    print("ML models trained successfully.")
+
 def predict_scores(file_tree: list[str]) -> dict:
-    """Uses a lightweight structural heuristic algorithm mathematically equivalent to the data the Random Forest would have been trained on, bypassing the massive 250MB AWS Lambda constraint of Scikit-Learn binaries."""
+    """Uses the trained models to predict scores for a new repository file tree."""
+    if not models:
+        train_models()
+        
     features = extract_features(file_tree)
+    X_new = pd.DataFrame([features])
     
-    test_ratio = features['test_ratio']
-    doc_ratio = features['doc_ratio']
-    has_ci = features['has_ci']
-    has_docker = features['has_docker']
-    max_depth = features['max_depth']
-    config_files = features['config_files']
-    
-    # Calculate scores probabilistically based on the exact same logic the Random Forest previously memorized
-    code_quality = 40 + (test_ratio * 100) + (has_ci * 10) - (max_depth * 2)
-    security = 50 + (has_docker * 10) + (has_ci * 15)
-    documentation = 30 + (doc_ratio * 300)
-    maintainability = 60 + (test_ratio * 50) + (doc_ratio * 100) - (max_depth * 3)
-    dependencies = 50 + (config_files * 3)
-    test_coverage = test_ratio * 250
-    
-    raw_scores = {
-        'codeQuality': code_quality,
-        'security': security,
-        'documentation': documentation,
-        'maintainability': maintainability,
-        'dependencies': dependencies,
-        'testCoverage': test_coverage
-    }
-    
-    # Cap logically between 10 to 100
-    scores = {k: int(min(100, max(10, v))) for k, v in raw_scores.items()}
-    
-    # Calculate overall as average
-    scores['overall'] = int(sum(scores.values()) / len(scores))
-    
-    return scores
+    predictions = {}
+    for target, model in models.items():
+        pred_value = model.predict(X_new)[0]
+        predictions[target] = int(min(100, max(0, pred_value))) # Clamp to 0-100
+        
+    return predictions
