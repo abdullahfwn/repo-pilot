@@ -1,7 +1,6 @@
 <div align="center">
   <img width="800" alt="GHBanner" src="assets/preview.jpg" />
 </div>
-
 <h1 align="center">RepoPilot</h1>
 <p align="center">
   <b>Instant AI-Powered GitHub Repository Analyzer</b><br/>
