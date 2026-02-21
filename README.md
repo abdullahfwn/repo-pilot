@@ -1,5 +1,5 @@
 <div align="center">
-  <img width="800" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
+  <img width="800" alt="GHBanner" src="assets/preview.jpg" />
 </div>
 
 <h1 align="center">RepoPilot</h1>
