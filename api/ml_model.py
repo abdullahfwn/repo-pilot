@@ -1,7 +1,4 @@
-from sklearn.ensemble import RandomForestRegressor
-from sklearn.pipeline import make_pipeline
-from sklearn.preprocessing import StandardScaler
-import numpy as np
+import random
 
 # A basic feature extractor for the file tree
 def extract_features(file_tree: list[str]) -> dict:
@@ -27,14 +24,14 @@ def generate_synthetic_data(num_samples=200):
     data = []
     for _ in range(num_samples):
         # Random feature simulation
-        total_files = np.random.randint(10, 500)
-        test_ratio = np.random.uniform(0, 0.4)
-        doc_ratio = np.random.uniform(0, 0.2)
-        has_ci = np.random.choice([0, 1], p=[0.4, 0.6])
-        has_docker = np.random.choice([0, 1], p=[0.5, 0.5])
-        js_ts_files = int(total_files * np.random.uniform(0.1, 0.8))
-        config_files = np.random.randint(2, 10)
-        max_depth = np.random.randint(2, 8)
+        total_files = random.randint(10, 500)
+        test_ratio = random.uniform(0, 0.4)
+        doc_ratio = random.uniform(0, 0.2)
+        has_ci = random.choice([0, 1])
+        has_docker = random.choice([0, 1])
+        js_ts_files = int(total_files * random.uniform(0.1, 0.8))
+        config_files = random.randint(2, 10)
+        max_depth = random.randint(2, 8)
         
         # Calculate scores realistically
         code_quality = 40 + (test_ratio * 100) + (has_ci * 10) - (max_depth * 2)
@@ -45,16 +42,16 @@ def generate_synthetic_data(num_samples=200):
         test_coverage = test_ratio * 250
         
         # Cap at 100
-        scores = {k: min(100, max(10, v)) for k, v in {
+        raw_scores = {
             'codeQuality': code_quality,
             'security': security,
             'documentation': documentation,
             'maintainability': maintainability,
             'dependencies': dependencies,
             'testCoverage': test_coverage
-        }.items()}
+        }
         
-        # Calculate overall as average
+        scores = {k: min(100, max(10, v)) for k, v in raw_scores.items()}
         scores['overall'] = sum(scores.values()) / len(scores)
 
         features = {
@@ -75,39 +72,105 @@ def generate_synthetic_data(num_samples=200):
         
     return data
 
+class StandardScaler:
+    def __init__(self):
+        self.means = []
+        self.stds = []
+        
+    def fit_transform(self, X):
+        n_samples = len(X)
+        n_features = len(X[0])
+        self.means = [sum(x[j] for x in X) / n_samples for j in range(n_features)]
+        
+        self.stds = []
+        for j in range(n_features):
+            variance = sum((x[j] - self.means[j]) ** 2 for x in X) / n_samples
+            self.stds.append((variance ** 0.5) if variance > 0 else 1.0)
+            
+        return self.transform(X)
+        
+    def transform(self, X):
+        return [[(x[j] - self.means[j]) / self.stds[j] for j in range(len(x))] for x in X]
+
+class PurePythonLinearRegressor:
+    """A native Machine Learning model trained exclusively from scratch using Gradient Descent!"""
+    def __init__(self, learning_rate=0.1, epochs=500):
+        self.lr = learning_rate
+        self.epochs = epochs
+        self.weights = []
+        self.bias = 0.0
+        
+    def fit(self, X, y):
+        n_samples = len(X)
+        n_features = len(X[0])
+        self.weights = [0.0] * n_features
+        
+        for _ in range(self.epochs):
+            y_predicted = self.predict(X)
+            
+            dw = [0.0] * n_features
+            db = 0.0
+            
+            for i in range(n_samples):
+                error = y_predicted[i] - y[i]
+                db += error
+                for j in range(n_features):
+                    dw[j] += error * X[i][j]
+                    
+            for j in range(n_features):
+                self.weights[j] -= (self.lr / n_samples) * dw[j]
+            self.bias -= (self.lr / n_samples) * db
+            
+    def predict(self, X):
+        predictions = []
+        for x in X:
+            pred = self.bias + sum(self.weights[j] * x[j] for j in range(len(x)))
+            predictions.append(pred)
+        return predictions
+
+class MLPipeline:
+    def __init__(self):
+        self.scaler = StandardScaler()
+        self.model = PurePythonLinearRegressor()
+        
+    def fit(self, X, y):
+        X_scaled = self.scaler.fit_transform(X)
+        self.model.fit(X_scaled, y)
+        
+    def predict(self, X):
+        X_scaled = self.scaler.transform(X)
+        return self.model.predict(X_scaled)
+
 # Global models dictionary
 models = {}
 feature_cols = [
     'total_files', 'js_ts_files', 'py_files', 'md_files', 'test_files',
     'config_files', 'has_docker', 'has_ci', 'max_depth', 'test_ratio', 'doc_ratio'
 ]
-target_cols = ['overall', 'codeQuality', 'security', 'documentation', 'maintainability', 'dependencies', 'testCoverage']
+target_cols = ['codeQuality', 'security', 'documentation', 'maintainability', 'dependencies', 'testCoverage', 'overall']
 
 def train_models():
-    """Trains the regression models on the synthetic dataset."""
-    print("Training ML models...")
+    """Trains Custom Native ML Models natively from scratch via Gradient Descent on the synthetic dataset."""
+    print("Training Custom ML models via Gradient Descent...")
     data = generate_synthetic_data(500)
     
-    # Extract feature values based on the order in extract_features
-    # We'll just separate X and Y directly by columns
-    # features has 11 keys, scores has 7 keys
+    # 11 features
     X = [row[:11] for row in data]
     Y = [row[11:] for row in data]
     
     for idx, target in enumerate(target_cols):
         y = [row[idx] for row in Y]
-        model = make_pipeline(StandardScaler(), RandomForestRegressor(n_estimators=50, random_state=42))
+        model = MLPipeline()
         model.fit(X, y)
         models[target] = model
         
-    print("ML models trained successfully.")
+    print("Custom Built Native ML models trained successfully!")
 
 def predict_scores(file_tree: list[str]) -> dict:
-    """Uses the trained models to predict scores for a new repository file tree."""
+    """Uses the custom trained Gradient-Descent model to predict scores for a new repository file tree."""
     if not models:
         train_models()
         
-    # Only extract the exact feature values in the exact array sequence matching training layout
     features = extract_features(file_tree)
     X_new = [list(features.values())]
     
