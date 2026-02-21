@@ -44,18 +44,18 @@ export default function LandingHero({ onAnalyze }: LandingHeroProps) {
       initial={{ opacity: 0, filter: 'blur(10px)' }}
       animate={{ opacity: 1, filter: 'blur(0px)' }}
       transition={{ duration: 0.8, ease: "easeOut" }}
-      className="flex flex-col items-center justify-center pt-16 pb-24 px-4 sm:px-6 lg:px-8"
+      className="flex flex-1 w-full flex-col items-center justify-center pt-16 pb-24 px-4 sm:px-6 lg:px-8"
     >
       {/* Hero Header */}
       <div className="text-center max-w-4xl mx-auto space-y-6">
 
-        <div className="flex flex-col items-center justify-center">
+        <div className="flex flex-col items-center justify-center w-full px-2">
           <BlurText
             text="Understand Any Code"
             delay={150}
             animateBy="words"
             direction="top"
-            className="text-4xl sm:text-5xl md:text-7xl font-serif font-normal tracking-tight text-abyssal leading-[1.1] mb-2 justify-center"
+            className="text-[2.2rem] sm:text-5xl md:text-7xl font-serif font-normal tracking-tighter text-abyssal leading-[1] mb-2 justify-center text-center w-full"
             stepDuration={0.8}
           />
           <BlurText
@@ -63,7 +63,7 @@ export default function LandingHero({ onAnalyze }: LandingHeroProps) {
             delay={150}
             animateBy="words"
             direction="bottom"
-            className="text-4xl sm:text-5xl md:text-7xl font-serif font-normal tracking-tight text-truffle leading-[1.1] justify-center"
+            className="text-[2.2rem] sm:text-5xl md:text-7xl font-serif font-normal tracking-tighter text-truffle leading-[1] justify-center text-center w-full"
             stepDuration={0.8}
           />
         </div>
@@ -76,7 +76,7 @@ export default function LandingHero({ onAnalyze }: LandingHeroProps) {
             <div className="relative group">
               <div className="absolute -inset-0.5 bg-burningFlame/50 rounded-lg blur opacity-30 group-hover:opacity-75 transition duration-500"></div>
               <div className="relative flex items-center bg-white rounded-lg p-1 shadow-lg border border-oatmeal">
-                <div className="pl-3 text-abyssal/50">
+                <div className="pl-3 text-abyssal/50 flex-shrink-0">
                   <Search className="h-4 w-4" />
                 </div>
                 <input
@@ -84,7 +84,7 @@ export default function LandingHero({ onAnalyze }: LandingHeroProps) {
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   placeholder="Target Repository URL (e.g., facebook/react)"
-                  className="flex-1 bg-transparent border-none text-abyssal placeholder-abyssal/40 focus:ring-0 focus:outline-none px-3 py-3 font-mono text-sm"
+                  className="flex-1 min-w-0 bg-transparent border-none text-abyssal placeholder-abyssal/40 focus:ring-0 focus:outline-none px-2 sm:px-3 py-3 font-mono text-xs sm:text-sm"
                 />
               </div>
             </div>

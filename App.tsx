@@ -45,10 +45,10 @@ export default function App() {
 
     try {
       const repoName = cleanUrl.split('github.com/')[1] || cleanUrl;
-      
+
       const data = await analyzeRepository(repoName, refs);
       setAnalysisData(data);
-      
+
       // Save to Cache (Full Analysis)
       try {
         localStorage.setItem(cacheKey, JSON.stringify(data));
@@ -91,15 +91,15 @@ export default function App() {
       } catch (e) {
         recents = [];
       }
-      
+
       if (!Array.isArray(recents)) recents = [];
-      
+
       // Remove duplicates based on name
       recents = recents.filter((r: any) => r.name.toLowerCase() !== recentRepo.name.toLowerCase());
-      
+
       // Add new repo to the beginning
       recents.unshift(recentRepo);
-      
+
       // Keep only top 3
       if (recents.length > 3) {
         recents = recents.slice(0, 3);
@@ -120,39 +120,39 @@ export default function App() {
   };
 
   return (
-    <motion.div 
+    <motion.div
       initial={{ opacity: 0, filter: 'blur(10px)' }}
       animate={{ opacity: 1, filter: 'blur(0px)' }}
       transition={{ duration: 0.8, ease: "easeOut" }}
-      className="min-h-screen bg-palladian text-abyssal font-mono selection:bg-burningFlame selection:text-abyssal"
+      className="min-h-[100dvh] bg-palladian text-abyssal font-mono selection:bg-burningFlame selection:text-abyssal overflow-x-hidden flex flex-col"
     >
       {/* Navigation Bar - Abyssal Anchorfish Blue */}
-      <nav className="border-b border-oatmeal bg-abyssal sticky top-0 z-50 shadow-md">
+      <nav className="border-b border-oatmeal bg-abyssal sticky top-0 z-50 shadow-md w-full">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center space-x-3 cursor-pointer group" onClick={handleReset}>
-              <div className="bg-palladian/10 p-2 rounded-lg border border-palladian/20 group-hover:bg-palladian/20 transition-colors">
-                <FolderSearch className="h-6 w-6 text-burningFlame" />
+          <div className="flex items-center justify-between h-14 sm:h-16">
+            <div className="flex items-center space-x-2 sm:space-x-3 cursor-pointer group" onClick={handleReset}>
+              <div className="bg-palladian/10 p-1.5 sm:p-2 rounded-lg border border-palladian/20 group-hover:bg-palladian/20 transition-colors">
+                <FolderSearch className="h-5 w-5 sm:h-6 sm:w-6 text-burningFlame" />
               </div>
-              <span className="text-2xl font-serif font-normal text-palladian">
+              <span className="text-xl sm:text-2xl font-serif font-normal text-palladian">
                 RepoPilot
               </span>
             </div>
 
-            <a 
-              href="https://github.com/abdullahfwn/" 
-              target="_blank" 
+            <a
+              href="https://github.com/abdullahfwn/"
+              target="_blank"
               rel="noopener noreferrer"
-              className="text-palladian hover:text-burningFlame transition-colors p-2"
+              className="text-palladian hover:text-burningFlame transition-colors p-1.5 sm:p-2"
               aria-label="GitHub Profile"
             >
-              <Github className="h-6 w-6" />
+              <Github className="h-5 w-5 sm:h-6 sm:w-6" />
             </a>
           </div>
         </div>
       </nav>
 
-      <main className="relative">
+      <main className="relative flex-1 flex flex-col">
         {error && (
           <div className="max-w-7xl mx-auto px-4 mt-6">
             <div className="bg-truffle/10 border border-truffle/20 text-truffle p-4 rounded-lg flex items-center space-x-3 animate-fade-in-down">
@@ -167,8 +167,8 @@ export default function App() {
         )}
 
         {currentView === 'loading' && (
-          <AnalysisLoader 
-            repoUrl={repoUrl} 
+          <AnalysisLoader
+            repoUrl={repoUrl}
             isFinished={isAnalysisComplete}
             onAnimationComplete={handleLoaderFinished}
           />
