@@ -1,4 +1,3 @@
-import pandas as pd
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
@@ -72,9 +71,9 @@ def generate_synthetic_data(num_samples=200):
             'doc_ratio': doc_ratio,
         }
         
-        data.append({**features, **scores})
+        data.append(list(features.values()) + list(scores.values()))
         
-    return pd.DataFrame(data)
+    return data
 
 # Global models dictionary
 models = {}
@@ -87,11 +86,16 @@ target_cols = ['overall', 'codeQuality', 'security', 'documentation', 'maintaina
 def train_models():
     """Trains the regression models on the synthetic dataset."""
     print("Training ML models...")
-    df = generate_synthetic_data(500)
-    X = df[feature_cols]
+    data = generate_synthetic_data(500)
     
-    for target in target_cols:
-        y = df[target]
+    # Extract feature values based on the order in extract_features
+    # We'll just separate X and Y directly by columns
+    # features has 11 keys, scores has 7 keys
+    X = [row[:11] for row in data]
+    Y = [row[11:] for row in data]
+    
+    for idx, target in enumerate(target_cols):
+        y = [row[idx] for row in Y]
         model = make_pipeline(StandardScaler(), RandomForestRegressor(n_estimators=50, random_state=42))
         model.fit(X, y)
         models[target] = model
@@ -103,8 +107,9 @@ def predict_scores(file_tree: list[str]) -> dict:
     if not models:
         train_models()
         
+    # Only extract the exact feature values in the exact array sequence matching training layout
     features = extract_features(file_tree)
-    X_new = pd.DataFrame([features])
+    X_new = [list(features.values())]
     
     predictions = {}
     for target, model in models.items():
