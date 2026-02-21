@@ -1,7 +1,8 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-import httpx
+import urllib.request
+import json
 from ml_model import predict_scores
 
 app = FastAPI()
@@ -38,35 +39,37 @@ def get_file_score(p: str) -> int:
     
     return 5
 
-async def fetch_github_tree(owner: str, repo: str) -> list[str]:
+def fetch_github_tree(owner: str, repo: str) -> list[str]:
     url = f"https://api.github.com/repos/{owner}/{repo}/git/trees/HEAD?recursive=1"
-    async with httpx.AsyncClient() as client:
-        response = await client.get(url, timeout=15.0)
+    req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+    try:
+        with urllib.request.urlopen(req, timeout=15.0) as response:
+            if response.status != 200:
+                raise HTTPException(status_code=400, detail="Failed to fetch repository tree from GitHub.")
+            data = json.loads(response.read().decode('utf-8'))
+    except Exception as e:
+        raise HTTPException(status_code=400, detail="Failed to fetch repository tree from GitHub.")
+
+    if 'tree' not in data:
+        return []
         
-        if response.status_code != 200:
-            raise HTTPException(status_code=400, detail="Failed to fetch repository tree from GitHub.")
-            
-        data = response.json()
-        if 'tree' not in data:
-            return []
-            
-        # Filter and sort exactly like the old frontend implementation
-        tree = [
-            item['path'] for item in data['tree']
-            if item['type'] in ['blob', 'tree']
-            and not item['path'].lower().endswith(('.png', '.jpg', '.pdf', '.lock', '.ico'))
-            and not any(part in item['path'].split('/') for part in ['node_modules', 'dist', '.git', 'vendor'])
-        ]
-        
-        # Sort by relevance and take top 200 for consistency
-        tree.sort(key=get_file_score, reverse=True)
-        return tree[:200]
+    # Filter and sort exactly like the old frontend implementation
+    tree = [
+        item['path'] for item in data['tree']
+        if item['type'] in ['blob', 'tree']
+        and not item['path'].lower().endswith(('.png', '.jpg', '.pdf', '.lock', '.ico'))
+        and not any(part in item['path'].split('/') for part in ['node_modules', 'dist', '.git', 'vendor'])
+    ]
+    
+    # Sort by relevance and take top 200 for consistency
+    tree.sort(key=get_file_score, reverse=True)
+    return tree[:200]
 
 @app.post("/api/analyze")
-async def analyze_repo(request: AnalyzeRequest):
+def analyze_repo(request: AnalyzeRequest):
     try:
         # Fetch actual file tree from github
-        file_tree = await fetch_github_tree(request.owner, request.repo)
+        file_tree = fetch_github_tree(request.owner, request.repo)
         if not file_tree:
              raise HTTPException(status_code=400, detail="Repository is empty or unreadable.")
              
