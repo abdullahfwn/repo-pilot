@@ -44,11 +44,14 @@ export async function analyzeRepository(repoName: string, references: string): P
 
       if (!mlResponse.ok) {
         let errMessage = `HTTP Error ${mlResponse.status} from ML Backend`;
+        const errText = await mlResponse.text();
         try {
-          const errJson = await mlResponse.json();
-          if (errJson && errJson.detail) errMessage = errJson.detail;
+          if (errText) {
+            const errJson = JSON.parse(errText);
+            if (errJson && errJson.detail) errMessage = errJson.detail;
+            else errMessage = errText;
+          }
         } catch {
-          const errText = await mlResponse.text();
           if (errText) errMessage = errText;
         }
         throw new Error(errMessage);
