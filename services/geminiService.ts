@@ -117,7 +117,8 @@ export async function analyzeRepository(repoName: string, references: string): P
       
       1. **Overview**: Deduce purpose, audience, stack.
          - **How to Run**: Provide a specific array of shell commands to setup and start the project. 
-      2. **Recommendations**: Provide exactly 3 actionable recommendations based on the file tree structure.
+      2. **Recommendations**: Provide actionable recommendations based on the file tree structure. For each recommendation, the "type" property MUST be exactly one of: "Issue", "Automation", or "Refactor".
+
       
       CRITICAL: Be concise. Return JSON only.
     `;
