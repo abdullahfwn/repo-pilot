@@ -43,7 +43,7 @@ def fetch_github_tree(owner: str, repo: str) -> list[str]:
     url = f"https://api.github.com/repos/{owner}/{repo}/git/trees/HEAD?recursive=1"
     req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
     try:
-        with urllib.request.urlopen(req, timeout=15.0) as response:
+        with urllib.request.urlopen(req, timeout=8.0) as response:
             if response.status != 200:
                 raise HTTPException(status_code=400, detail="Failed to fetch repository tree from GitHub.")
             data = json.loads(response.read().decode('utf-8'))

@@ -94,7 +94,7 @@ class StandardScaler:
 
 class PurePythonLinearRegressor:
     """A native Machine Learning model trained exclusively from scratch using Gradient Descent!"""
-    def __init__(self, learning_rate=0.1, epochs=500):
+    def __init__(self, learning_rate=0.1, epochs=50):
         self.lr = learning_rate
         self.epochs = epochs
         self.weights = []
@@ -152,7 +152,7 @@ target_cols = ['codeQuality', 'security', 'documentation', 'maintainability', 'd
 def train_models():
     """Trains Custom Native ML Models natively from scratch via Gradient Descent on the synthetic dataset."""
     print("Training Custom ML models via Gradient Descent...")
-    data = generate_synthetic_data(500)
+    data = generate_synthetic_data(100)
     
     # 11 features
     X = [row[:11] for row in data]
