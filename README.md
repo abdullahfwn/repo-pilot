@@ -70,8 +70,8 @@ source venv/bin/activate
 pip install fastapi uvicorn pydantic scikit-learn httpx
 
 # 4. Start the backend server
-cd backend
-python -m uvicorn main:app --reload --port 8000
+cd api
+python -m uvicorn index:app --reload --port 8000
 ```
 > The backend will securely watch for ML score generation requests from the front client on `localhost:8000`.
 

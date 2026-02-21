@@ -36,7 +36,12 @@ export async function analyzeRepository(repoName: string, references: string): P
     // 1. Call our Python ML Backend to get scores and file tree
     let mlData;
     try {
-      const mlResponse = await fetch('/api/analyze', {
+      // Use an environment variable for production (e.g. deployed on Vercel), fallback to relative for local Vite proxy
+      // @ts-expect-error - Vite defines import.meta.env
+      const backendUrl = import.meta.env.VITE_BACKEND_URL || '';
+      const endpoint = `${backendUrl}/api/analyze`;
+
+      const mlResponse = await fetch(endpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ owner: repoDetails.owner, repo: repoDetails.repo })
